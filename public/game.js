@@ -5,62 +5,67 @@ const maxReconnectAttempts = 5;
 const reconnectDelay = 3000;
 
 function connect() {
+    // 获取当前环境的WebSocket URL
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.hostname || 'localhost';
-    const port = window.location.port || '3000';
-    const wsUrl = `${protocol}//${host}:${port}/ws`;
+    const wsUrl = `${protocol}//${host}/ws`;
     
     console.log('正在连接到WebSocket服务器:', wsUrl);
     
-    ws = new WebSocket(wsUrl);
-    
-    ws.onopen = () => {
-        console.log('WebSocket连接已建立');
-        showConnectionStatus('已连接', 'success');
-        reconnectAttempts = 0;
-        document.getElementById('connection-status').textContent = '已连接';
-        document.getElementById('connection-status').style.color = 'green';
-        // 显示加入游戏区域
-        document.getElementById('join-section').style.display = 'block';
-    };
-    
-    ws.onclose = () => {
-        console.log('WebSocket连接已关闭');
-        showConnectionStatus('已断开连接', 'error');
-        document.getElementById('connection-status').textContent = '已断开';
-        document.getElementById('connection-status').style.color = 'red';
-        document.getElementById('join-section').style.display = 'none';
+    try {
+        ws = new WebSocket(wsUrl);
         
-        // 重连逻辑
-        if (reconnectAttempts < maxReconnectAttempts) {
-            setTimeout(() => {
-                reconnectAttempts++;
-                showConnectionStatus(`正在尝试重新连接 (${reconnectAttempts}/${maxReconnectAttempts})...`, 'warning');
-                connect();
-            }, reconnectDelay);
-        } else {
-            console.log('达到最大重连次数');
-            document.getElementById('connection-status').textContent = '连接失败';
-            showError('无法连接到服务器，请刷新页面重试');
-        }
-    };
-    
-    ws.onerror = (error) => {
-        console.error('WebSocket错误:', error);
-        showError('连接发生错误');
-        document.getElementById('connection-status').textContent = '连接错误';
-        document.getElementById('connection-status').style.color = 'red';
-    };
-    
-    ws.onmessage = (event) => {
-        try {
-            const data = JSON.parse(event.data);
-            updateGameState(data);
-        } catch (error) {
-            console.error('消息处理错误:', error);
-            showError('游戏数据处理错误');
-        }
-    };
+        ws.onopen = () => {
+            console.log('WebSocket连接已建立');
+            showConnectionStatus('已连接', 'success');
+            reconnectAttempts = 0;
+            // 显示加入游戏区域
+            document.getElementById('join-section').style.display = 'block';
+        };
+        
+        ws.onclose = (event) => {
+            console.log('WebSocket连接已关闭', event.code, event.reason);
+            showConnectionStatus('已断开连接', 'error');
+            document.getElementById('join-section').style.display = 'none';
+            
+            // 重连逻辑
+            if (reconnectAttempts < maxReconnectAttempts) {
+                setTimeout(() => {
+                    reconnectAttempts++;
+                    showConnectionStatus(`正在尝试重新连接 (${reconnectAttempts}/${maxReconnectAttempts})...`, 'warning');
+                    connect();
+                }, reconnectDelay);
+            } else {
+                showError('无法连接到服务器，请刷新页面重试');
+            }
+        };
+        
+        ws.onerror = (error) => {
+            console.error('WebSocket错误:', error);
+            showError('连接发生错误');
+        };
+        
+        ws.onmessage = (event) => {
+            try {
+                const response = JSON.parse(event.data);
+                console.log('收到消息:', response);
+                
+                if (response.type === 'connected') {
+                    console.log('连接确认:', response.message);
+                } else if (response.type === 'gameState') {
+                    updateGameState(response.data);
+                } else if (response.type === 'error') {
+                    showError(response.message);
+                }
+            } catch (error) {
+                console.error('消息处理错误:', error);
+                showError('游戏数据处理错误');
+            }
+        };
+    } catch (error) {
+        console.error('创建WebSocket连接时出错:', error);
+        showError('无法创建连接');
+    }
 }
 
 function showConnectionStatus(message, type) {

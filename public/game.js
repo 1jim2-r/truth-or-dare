@@ -12,9 +12,8 @@ const resetButton = document.getElementById('resetButton');
 // 连接WebSocket服务器
 function connect() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.hostname;
-    const port = window.location.port;
-    const wsUrl = port ? `${protocol}//${host}:${port}` : `${protocol}//${host}`;
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}`;
     
     console.log('尝试连接到WebSocket服务器:', wsUrl);
     

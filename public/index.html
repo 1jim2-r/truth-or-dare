@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>真心话大冒险 - 在线版</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #1890ff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .connected {
+            background-color: #52c41a;
+            color: white;
+        }
+
+        .disconnected {
+            background-color: #ff4d4f;
+            color: white;
+        }
+
+        .setup-area {
+            margin-bottom: 20px;
+        }
+
+        .game-area {
+            display: none;
+        }
+
+        .player-list {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .player-item {
+            padding: 5px 0;
+        }
+
+        .button-group {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #1890ff;
+            color: white;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #40a9ff;
+        }
+
+        button:disabled {
+            background-color: #d9d9d9;
+            cursor: not-allowed;
+        }
+
+        input {
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            width: 200px;
+        }
+
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e6f7ff;
+            border-radius: 5px;
+            white-space: pre-line;
+        }
+
+        .punishment-area {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff2e8;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="connectionStatus" class="connection-status disconnected">未连接</div>
+        <h1>真心话大冒险</h1>
+
+        <div id="setupArea" class="setup-area">
+            <div>
+                <label for="playerName">你的名字:</label>
+                <input type="text" id="playerName" placeholder="请输入你的名字">
+            </div>
+            <div class="button-group">
+                <button id="joinButton" onclick="joinGame()" disabled>加入游戏</button>
+                <button id="startButton" onclick="startGame()" disabled>开始游戏</button>
+            </div>
+        </div>
+
+        <div id="playerList" class="player-list">
+            <!-- 玩家列表将在这里动态显示 -->
+        </div>
+
+        <div id="gameArea" class="game-area">
+            <div id="currentPlayer"></div>
+            <div class="button-group">
+                <button onclick="chooseOption('truth')">真心话</button>
+                <button onclick="chooseOption('dare')">大冒险</button>
+            </div>
+            <div id="result" class="result"></div>
+            <div class="button-group">
+                <button id="nextButton" onclick="nextTurn()" disabled>下一个</button>
+                <button id="resetButton" onclick="resetGame()" disabled>重置游戏</button>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html> 
